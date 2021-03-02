@@ -23,6 +23,8 @@ Compatibility with RTMidi is not my goal. Instead, I:
 * use [GLib](https://developer.gnome.org/glib/stable) types when simple C tools are not enough for me
 * try to document it all using Sphinx and Hawkmoth
 
-## Jack
+## Future plans
+
+### Jack
 
 One day, I might try and rewrite [JACK](https://jackaudio.org/) API and add it to RMR, I like using it for audio, but I don't use it for MIDI yet.
