@@ -1,0 +1,43 @@
+Examples
+========
+
+MIDI supports input and output ports.
+
+If you are writing a code that other programs will find and connect, create a **virtual** port.
+It will pretend to be an input or output device.
+
+Otherwise, connect to software or devices using normal **input** or **output** ports.
+
+There are 4 primary examples:
+
+* virtual input
+* virtual output
+* input
+* output
+
+Virtual input
+-------------
+
+Virtual output
+--------------
+
+I had inconsistent note intervals while making this example.
+
+I've used **millis()** and **usleep(N)** calls.
+It's possible to feed usleep values that make these intervals inconsistent.
+Current intervals are **100**, but I'd have to play with this idea more.
+
+.. code-block:: c
+
+  // Returns the milliseconds since Epoch
+  double millis() {
+          struct timeval cur_time;
+          gettimeofday(&cur_time, NULL);
+          return (cur_time.tv_sec * 1000.0) + cur_time.tv_usec / 1000.0;
+  }
+
+Input
+-----
+
+Output
+------
