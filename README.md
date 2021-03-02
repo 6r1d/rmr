@@ -8,7 +8,7 @@ This is my personal, derivative project.
 **I might change API a lot, project is not stable. Use RMR at your own risk.**
 (But I'll be happy to discuss RMR with you in issues!)
 
-There are many RtMIDI forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for `C++17 <https://en.wikipedia.org/wiki/C%2B%2B17>`_.
+There are many RtMIDI forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for [C++17](https://en.wikipedia.org/wiki/C%2B%2B17).
 
 ## Motivation
 
