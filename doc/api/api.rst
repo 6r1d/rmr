@@ -12,9 +12,6 @@ API documentation
    error_handling
    logging
 
-TO-DOs
-------
-
 Future ideas
 ------------
 
