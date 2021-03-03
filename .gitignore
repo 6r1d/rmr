@@ -1,1 +1,7 @@
 doc/_build/
+examples/input_bytes/input
+examples/output/output
+examples/virtual_input_bytes/virtual_input
+examples/virtual_output/virtual_output
+test/set_client_name/main
+test/set_port_name/main
