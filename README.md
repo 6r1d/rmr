@@ -1,10 +1,11 @@
-# RMR: RtMIDI, reduced
 [![](https://readthedocs.org/projects/rmr/badge/?version=latest&style=flat)](https://rmr.readthedocs.io/)
+
+# RMR: RtMIDI, reduced
 
 Hello and welcome to RMR's readme.
 
-This is a simplified rewrite of RtMIDI's Alsa part, from C++ to pure C + GLib library.
-(API calls and struct members are different from RtMIDI.)
+This is a simplified rewrite of RtMIDI's Alsa part: C++ → C + GLib library.
+API calls and struct members **are different** from RtMIDI.
 
 This is my personal, derivative project, although I'd be happy if you discuss it with me in [issues](https://github.com/6r1d/rmr/issues).
 
