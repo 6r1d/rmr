@@ -37,6 +37,13 @@ This is my personal, derivative project, although I'd be happy if you discuss it
 
 One day, I might try and rewrite [JACK](https://jackaudio.org/) API and add it to RMR, I like using it for audio, but I don't use it for MIDI yet.
 
+## Legal and ethical
+
+The RMR is MIT-licensed.
+If you create a pull request, it will also be very nice of you to add a PR for the original RtMIDI repo and I'm ready to help with that.
+Initially, I wanted it to have the same non-binding license clause, but that way, GitHub can not detect the license.
+(Please inform me in the issues if there's anything wrong with it.)
+
 ## Other great [RtMIDI](https://github.com/thestk/rtmidi) forks
 
 There are other [RtMIDI](https://github.com/thestk/rtmidi) forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for [C++17](https://en.wikipedia.org/wiki/C%2B%2B17).
