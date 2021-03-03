@@ -1,5 +1,6 @@
 [![](https://readthedocs.org/projects/rmr/badge/?version=latest&style=flat)](https://rmr.readthedocs.io/)
-![](https://img.shields.io/github/v/release/6r1d/rmr?include_prereleases)
+![](https://img.shields.io/github/v/release/6r1d/rmr?include_prereleases?style=flat)
+[![](https://img.shields.io/github/license/6r1d/rmr?style=flat)](https://github.com/6r1d/rmr/blob/main/LICENSE)
 
 # RMR: RtMIDI, reduced
 
