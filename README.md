@@ -32,7 +32,7 @@ This is my personal, derivative project, although I'd be happy if you discuss it
 
 One day, I might try and rewrite [JACK](https://jackaudio.org/) API and add it to RMR, I like using it for audio, but I don't use it for MIDI yet.
 
-## Forks by others
+## Other great RtMIDI forks
 
 There are other RtMIDI forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for [C++17](https://en.wikipedia.org/wiki/C%2B%2B17).
 
