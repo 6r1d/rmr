@@ -61,3 +61,8 @@ html_static_path = ['_static']
 # -- Hawkmoth --------------------------------------------------------
 
 cautodoc_root = os.path.abspath("../include")
+
+# -- Read the docs----------------------------------------------------
+
+from hawkmoth.util import readthedocs
+readthedocs.clang_setup()
