@@ -20,10 +20,10 @@ This is my personal, derivative project, although I'd be happy if you discuss it
 ## Changes
 
 * C++ → C
+* use [GLib](https://developer.gnome.org/glib/stable) [asynchronous queues](https://developer.gnome.org/glib/stable/glib-Asynchronous-Queues.html) and [arrays](https://developer.gnome.org/glib/stable/glib-Arrays.html) when needed (mostly input code: arrays for variably sized SysEx messages and queues for inter-thread message passing)
 * removed OOP parts and use structs
 * changed OOP methods to simple functions
 * use of `GNU make` for examples
-* use [GLib](https://developer.gnome.org/glib/stable) types when simple C tools are not enough
 * documentation using Sphinx and Hawkmoth
 
 ## Future plans
