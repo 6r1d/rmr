@@ -1,4 +1,6 @@
 # RMR: RtMIDI, reduced
+[![](https://readthedocs.org/projects/rmr/badge/?version=latest&style=flat)](https://rmr.readthedocs.io/)
+
 Hello and welcome to RMR's readme.
 
 This is a simplified rewrite of RtMIDI's Alsa part, from C++ to pure C + GLib library.
