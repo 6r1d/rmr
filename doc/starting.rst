@@ -32,3 +32,15 @@ Calling wrappers
 +----------------+--------------------+------------------------------------------------+
 | Virtual output | Create an endpoint | :cc:`start_port(&amidi_data, MP_VIRTUAL_OUT);` |
 +----------------+--------------------+------------------------------------------------+
+
+Installation
+============
+
+Just clone the repo and include the library as the examples show.
+
+Requirements
+------------
+
+* Alsa — should be already installed in your Linux distro
+* GNU Make — generally available in your Linux distro
+* glib-2.0 — **libglib2.0-dev** in Ubuntu

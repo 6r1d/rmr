@@ -1,25 +1,31 @@
 Examples
 ========
 
-MIDI supports input and output ports.
+This page shows several examples of using RMR.
 
-If you are writing a code that other programs will find and connect, create a **virtual** port.
-It will pretend to be an input or output device.
+Which mode to use?
+------------------
+
+If you are writing a code that other programs will find and connect to, create a **virtual** port.
 
 Otherwise, connect to software or devices using normal **input** or **output** ports.
-
-There are 4 primary examples:
-
-* virtual input
-* virtual output
-* input
-* output
 
 Virtual input
 -------------
 
+.. literalinclude:: ../examples/virtual_input_bytes/virtual_input.c
+   :language: c
+   :linenos:
+
 Virtual output
 --------------
+
+.. literalinclude:: ../examples/virtual_output/virtual_output.c
+   :language: c
+   :linenos:
+
+Note: inconsistent intervals
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 I had inconsistent note intervals while making this example.
 
@@ -39,5 +45,14 @@ Current intervals are **100**, but I'd have to play with this idea more.
 Input
 -----
 
+.. literalinclude:: ../examples/input/input.c
+   :language: c
+   :linenos:
+
 Output
 ------
+
+.. literalinclude:: ../examples/output/output.c
+   :language: c
+   :linenos:
+
