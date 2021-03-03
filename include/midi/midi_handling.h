@@ -505,7 +505,7 @@ static void * alsa_MIDI_handler( void * ptr ) {
     GArray * bytes;
     double timestamp = 0.0;
     bytes = g_array_sized_new(FALSE, FALSE, sizeof(unsigned char), 0);
-    // Prepare for converting MIDI events to bytes
+    // Prepare a sequencer event record to convert a MIDI event to bytes
     snd_seq_event_t * ev;
     in_data->amidi_data->buffer_size = 32;
     // Create a MIDI event parser, process init error
@@ -801,6 +801,7 @@ int send_midi_message(Alsa_MIDI_data * amidi_data, const unsigned char * message
         }
         unsigned int offset = 0;
         while (offset < byte_count) {
+            // A sequencer event record for a message
             snd_seq_event_t ev;
             snd_seq_ev_clear(&ev);
             snd_seq_ev_set_source(&ev, amidi_data->vport);

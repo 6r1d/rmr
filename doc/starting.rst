@@ -50,4 +50,6 @@ Requirements
 
 .. [#client_term] Alsa has its own
                   `client term <https://www.alsa-project.org/alsa-doc/alsa-lib/seq.html#seq_client>`_ ,
-                  that has a different meaning.
+                  that has a different meaning: an Alsa seq client that has one or more
+                  ports as endpoints to communicate. Each port can be in a mode to read or write data
+                  and have other options.
