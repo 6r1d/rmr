@@ -10,12 +10,13 @@ It accepts a mode argument and calls 4 lower-level wrapper functions.
 Types of MIDI ports
 -------------------
 
-There are "normal" and virtual MIDI ports.
+There are virtual and non-virtual MIDI ports.
 
 Think about virtual MIDI input and ouptut in terms of endpoints you connect to.
-"Normal" MIDI ports connect to those.
+"Normal" or "non-virtual" MIDI ports connect to those.
 
-Client connecting to a server is a good analogy, too. In this analogy, a server is a "virtual port"
+`Client—server model <https://en.wikipedia.org/wiki/Client%E2%80%93server_model>`_, where a client [#client_term]_ connects to a server
+is a nice analogy, as well. In this analogy, a server is a "virtual port"
 and a client is "just a port".
 
 Calling wrappers
@@ -44,3 +45,9 @@ Requirements
 * Alsa — should be already installed in your Linux distro
 * GNU Make — generally available in your Linux distro
 * glib-2.0 — **libglib2.0-dev** in Ubuntu
+
+.. rubric:: Footnotes
+
+.. [#client_term] Alsa has its own
+                  `client term <https://www.alsa-project.org/alsa-doc/alsa-lib/seq.html#seq_client>`_ ,
+                  that has a different meaning.
