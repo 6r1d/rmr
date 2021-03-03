@@ -34,7 +34,7 @@ Calling wrappers
 +----------------+--------------------+------------------------------------------------+
 
 Installation
-============
+------------
 
 Just clone the repo and include the library as the examples show.
 

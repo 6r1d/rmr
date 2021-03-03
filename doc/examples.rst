@@ -55,7 +55,7 @@ Current intervals are **100**, but I'd have to play with this idea more.
 Input
 -----
 
-.. literalinclude:: ../examples/input/input_bytes.c
+.. literalinclude:: ../examples/input_bytes/input.c
    :language: c
    :linenos:
 
