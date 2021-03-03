@@ -1416,7 +1416,7 @@ int get_full_port_name(const char * port_name, unsigned int port_number, Alsa_MI
     // Generate a full port name
     sprintf(
         string_name,
-        "%s:%s %s:%s",
+        "%s:%s %d:%d",
         snd_seq_client_info_get_name(cinfo),
         snd_seq_port_info_get_name(pinfo),
         // These lines added to make sure devices are listed

@@ -10,6 +10,16 @@ If you are writing a code that other programs will find and connect to, create a
 
 Otherwise, connect to software or devices using normal **input** or **output** ports.
 
+How to build the examples?
+--------------------------
+
+Open each directory, type "make" and it should be enough to get an executable file in that directory.
+
+"Virtual input" is compatible with output, run "virtual input" first.
+
+"Virtual output" is compatible with input, rin "virtual output" first.
+
+
 Virtual input
 -------------
 
@@ -45,7 +55,7 @@ Current intervals are **100**, but I'd have to play with this idea more.
 Input
 -----
 
-.. literalinclude:: ../examples/input/input.c
+.. literalinclude:: ../examples/input/input_bytes.c
    :language: c
    :linenos:
 

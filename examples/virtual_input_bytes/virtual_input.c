@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "util/exit_handling.h"
+#include "util/output_handling.h"
 #include "util/midi_parsing.h"
 #include "midi/midi_handling.h"
 
@@ -10,24 +11,10 @@ MIDI_in_data * input_data;
 MIDI_message * msg;
 error_message * err_msg;
 
-// TODO move somewhere
-void print_midi_msg_buf(unsigned char * buf, long count) {
-    long byte_id;
-    for (byte_id = 0; byte_id < count; byte_id++) {
-        printf("%02x ", buf[byte_id]);
-    }
-    printf(" | ");
-    for (byte_id = 0; byte_id < count; byte_id++) {
-        printf("%d ", buf[byte_id]);
-    }
-    printf("\n");
-    fflush( stdout );
-}
-
 int main() {
     //
     prepare_input_data_with_queues(&input_data);
-    // TODO look thru each required call
+    // TODO look through each required call
     start_port(&data, MP_VIRTUAL_IN);
     //
     assign_midi_data(input_data, data);

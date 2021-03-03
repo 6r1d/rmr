@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "util/exit_handling.h"
+#include "util/output_handling.h"
 #include "midi/midi_handling.h"
 
 Alsa_MIDI_data * data;
@@ -9,24 +10,6 @@ MIDI_port * current_midi_port;
 
 MIDI_message * msg;
 error_message * err_msg;
-
-void print_midi_msg_buf(unsigned char * buf, long count) {
-    long byte_id;
-    for (byte_id = 0; byte_id < count; byte_id++) {
-        printf("%02x ", buf[byte_id]);
-    }
-    printf(" | ");
-    for (byte_id = 0; byte_id < count; byte_id++) {
-        printf("%d ", buf[byte_id]);
-    }
-    printf("\n");
-    fflush( stdout );
-}
-
-void print_midi_message_pointer(MIDI_message * msg) {
-    printf("PTR: %p\n", (void *) msg);
-    fflush( stdout );
-}
 
 int main() {
     prepare_input_data_with_queues(&input_data);
@@ -54,7 +37,6 @@ int main() {
             msg = g_async_queue_try_pop(input_data->midi_async_queue);
             if (msg != NULL) {
                 print_midi_msg_buf(msg->buf, msg->count);
-                print_midi_message_pointer(msg);
                 free_midi_message(msg);
             }
         }
