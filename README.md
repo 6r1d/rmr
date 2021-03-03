@@ -8,7 +8,7 @@ This is my personal, derivative project.
 **I might change API a lot, project is not stable. Use RMR at your own risk.**
 (But I'll be happy to discuss RMR with you in issues!)
 
-There are many RtMIDI forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for `C++17 <https://en.wikipedia.org/wiki/C%2B%2B17>`_.
+There are many RtMIDI forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for [C++17](https://en.wikipedia.org/wiki/C%2B%2B17).
 
 ## Motivation
 
@@ -23,6 +23,8 @@ Compatibility with RTMidi is not my goal. Instead, I:
 * use [GLib](https://developer.gnome.org/glib/stable) types when simple C tools are not enough for me
 * try to document it all using Sphinx and Hawkmoth
 
-## Jack
+## Future plans
+
+### Jack
 
 One day, I might try and rewrite [JACK](https://jackaudio.org/) API and add it to RMR, I like using it for audio, but I don't use it for MIDI yet.
