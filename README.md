@@ -1,4 +1,5 @@
 # RMR: RtMIDI, reduced
+Hello and welcome to RMR's readme.
 
 This is a simplified rewrite of RtMIDI's Alsa part, from C++ to pure C + GLib library.
 (API calls and struct members are different from RtMIDI.)
