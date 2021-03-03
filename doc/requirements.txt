@@ -1,2 +1,2 @@
 hawkmoth==0.7.0
-clang==11.0
+clang>=6
