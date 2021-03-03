@@ -10,6 +10,10 @@ This is my personal, derivative project.
 
 There are many RtMIDI forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for [C++17](https://en.wikipedia.org/wiki/C%2B%2B17).
 
+## Documentation
+
+[Latest documentation](https://rmr.readthedocs.io/en/latest/index.html) is available on [Read the Docs](https://readthedocs.org/).
+
 ## Motivation
 
 * I want to use RMR on Linux embedded devices and learn more about MIDI and [Alsa](https://www.alsa-project.org/wiki/Main_Page) while changing the code
