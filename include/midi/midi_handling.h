@@ -112,7 +112,8 @@ void assign_midi_data(MIDI_in_data * input_data, Alsa_MIDI_data * amidi_data) {
  * :since: v0.1
  */
 void set_MIDI_in_callback(
-    MIDI_in_data * input_data, MIDI_callback callback,
+    MIDI_in_data * input_data,
+    MIDI_callback callback,
     void *user_data
   ) {
     // Exit if a callback is already set.
@@ -213,7 +214,11 @@ void set_client_name(Alsa_MIDI_data *amidi_data, const char *client_name);
  *
  * :since: v0.1
  */
-int init_seq(Alsa_MIDI_data * amidi_data, const char * client_name, mp_type_t port_type) {
+int init_seq(
+    Alsa_MIDI_data * amidi_data,
+    const char * client_name,
+    mp_type_t port_type
+) {
     int result = 0;
     int seq_open_result;
     int seq_mode;
@@ -256,7 +261,11 @@ int init_seq(Alsa_MIDI_data * amidi_data, const char * client_name, mp_type_t po
  *
  * :since: v0.1
  */
-int start_input_seq(Alsa_MIDI_data* amidi_data, const char* queue_name, RMR_Port_config * port_config) {
+int start_input_seq(
+    Alsa_MIDI_data* amidi_data,
+    const char* queue_name,
+    RMR_Port_config * port_config
+) {
     int result = 0;
     do {
         // Check if a pipe can be created, set trigger_fds.
@@ -414,7 +423,8 @@ unsigned int port_info(
  * Counts midi ports for input and output types
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
- * :param type: Alsa MIDI port capabilities, like ":c:data:`SND_SEQ_PORT_CAP_READ` | :c:data:`SND_SEQ_PORT_CAP_SUBS_READ`" or ":c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE`"
+ * :param type: Alsa MIDI port capabilities, like ":c:data:`SND_SEQ_PORT_CAP_READ` | :c:data:`SND_SEQ_PORT_CAP_SUBS_READ`"
+ *              or ":c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE`"
  *
  * :returns: MIDI port count
  *
@@ -1351,6 +1361,20 @@ int start_input_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config)
     return result;
 }
 
+/**
+ * Fills :c:type:`RMR_Port_config` attributes.
+ *
+ * A port type is set first, then a queue tempo and ppq you can change.
+ * "client_name", "port_name" and "queue_name" are set as "N/A" and then changed
+ * to default values needed for a certain port type.
+ *
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
+ * :param port_type: a port type for a sequencer, supports all values for :c:type:`mp_type_t`
+ *
+ * :returns: **0** on success
+ *
+ * :since: v0.1.3
+ */
 int reset_port_config(RMR_Port_config * port_config, mp_type_t port_type) {
     // Set port type in a port config
     port_config->port_type = port_type;
@@ -1389,7 +1413,11 @@ int reset_port_config(RMR_Port_config * port_config, mp_type_t port_type) {
  * sets default values for it
  *
  * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
+ * :param port_type: a port type for a sequencer, supports all values for :c:type:`mp_type_t`
  *
+ * :returns: **0** on success
+ *
+ * :since: v0.1.3
  */
 int setup_port_config(RMR_Port_config ** port_config, mp_type_t port_type) {
     * port_config = NULL;
@@ -1403,6 +1431,9 @@ int setup_port_config(RMR_Port_config ** port_config, mp_type_t port_type) {
  *
  * :param port_config: an instance of port configuration (:c:type:`RMR_Port_config`)
  *
+ * :returns: **0** on success
+ *
+ * :since: v0.1.3
  */
 int destroy_port_config(RMR_Port_config * port_config) {
     int result = 0;
@@ -1447,10 +1478,11 @@ int start_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
  * Finds a complete port name, including both **client info** and **port info**.
  * A rewrite of both RtMIDI's getPortName functions.
  *
- * :param port_name:
- * :param port_number:
- * :param amidi_data:
- * :param in:
+ * :param port_name: a const char pointer pointing to a string to be filled
+ * :param port_number: a number of a port to look for
+ * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
+ * :param in: defines if a function is looking for "SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ" or
+ *            "SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE" capabilities
  *
  * :returns: **0** on success, **-1** when a MIDI port is not found.
  *

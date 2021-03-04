@@ -3,6 +3,7 @@ examples/input_bytes/input
 examples/output/output
 examples/virtual_input_bytes/virtual_input
 examples/virtual_output/virtual_output
+examples/virtual_input_detailed/virtual_input
 test/set_client_name/main
 test/set_port_name/main
 test/test_last_bytearray_byte/main
