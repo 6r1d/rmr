@@ -2,6 +2,9 @@
 [![](https://readthedocs.org/projects/rmr/badge/?version=latest&style=flat)](https://rmr.readthedocs.io/)
 ![](https://img.shields.io/github/v/release/6r1d/rmr?include_prereleases?style=flat)
 [![](https://img.shields.io/github/license/6r1d/rmr?style=flat)](https://github.com/6r1d/rmr/blob/main/LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/6r1d/rmr.svg)](https://github.com/6r1d/rmr/issues)
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/6r1d/rmr.svg)](http://isitmaintained.com/project/6r1d/rmr "Percentage of issues still open")
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/6r1d/rmr.svg)](https://isitmaintained.com/project/6r1d/rmr "Average time to resolve an issue")
 
 # RMR: RtMIDI, reduced
 
