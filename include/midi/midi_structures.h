@@ -17,9 +17,15 @@
 typedef struct MIDI_port {
     /** MIDI port number; related to iteration in port_info function and its port_number argument */
     unsigned int id;
-    /** A name of ALSA's :c:type:`snd_seq_client_info_t` container */
+    /**
+        A name of ALSA's :c:type:`snd_seq_client_info_t` container.
+        Can be redefined as char pointer later, but MIDI_port will need a destructor.
+    */
     char client_info_name[MAX_PORT_NAME_LEN];
-    /** A name of ALSA's :c:type:`snd_seq_port_info_t` container */
+    /**
+        A name of ALSA's :c:type:`snd_seq_port_info_t` container.
+        Can be redefined as char pointer later, but MIDI_port will need a destructor.
+    */
     char port_info_name[MAX_PORT_NAME_LEN];
     /** A client id of ALSA's :c:type:`snd_seq_port_info_t` container */
     int port_info_client_id;
