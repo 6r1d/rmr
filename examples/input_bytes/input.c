@@ -8,12 +8,18 @@ MIDI_in_data * input_data;
 
 MIDI_port * current_midi_port;
 
+RMR_Port_config * port_config;
+
 MIDI_message * msg;
 error_message * err_msg;
 
 int main() {
     prepare_input_data_with_queues(&input_data);
-    start_port(&data, MP_IN);
+
+    // Create a port configuration with default values
+    setup_port_config(&port_config, MP_IN);
+    // Start a port with a provided configruation
+    start_port(&data, port_config);
 
     init_midi_port(&current_midi_port);
 
@@ -22,7 +28,7 @@ int main() {
 
     // Count the MIDI ports,
     // open if a port containing "Synth" is available
-    if (find_midi_port(data, current_midi_port, "Bonsai", false) > 0) {
+    if (find_midi_port(data, current_midi_port, "rmr", false) > 0) {
         print_midi_port(current_midi_port);
         open_port(true, data, current_midi_port->id, current_midi_port->port_info_name, input_data);
         keep_process_running = 1;
@@ -47,6 +53,9 @@ int main() {
     }
 
     destroy_midi_input(data, input_data);
+
+    // Destroy a port configuration
+    destroy_port_config(port_config);
 
     // Exit without an error
     return 0;

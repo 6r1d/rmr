@@ -19,20 +19,37 @@ Think about virtual MIDI input and ouptut in terms of endpoints you connect to.
 is a nice analogy, as well. In this analogy, a server is a "virtual port"
 and a client is "just a port".
 
-Calling wrappers
-----------------
+Calling a wrapper
+-----------------
 
-+----------------+--------------------+------------------------------------------------+
-| MIDI port type | Use                | Init function                                  |
-+================+====================+================================================+
-| Input          | Connect to         | :cc:`start_port(&amidi_data, MP_IN);`          |
-+----------------+--------------------+------------------------------------------------+
-| Output         | Connect to         | :cc:`start_port(&amidi_data, MP_OUT);`         |
-+----------------+--------------------+------------------------------------------------+
-| Virtual input  | Create an endpoint | :cc:`start_port(&amidi_data, MP_VIRTUAL_IN);`  |
-+----------------+--------------------+------------------------------------------------+
-| Virtual output | Create an endpoint | :cc:`start_port(&amidi_data, MP_VIRTUAL_OUT);` |
-+----------------+--------------------+------------------------------------------------+
+There is a single wrapper that is made of two parts: a port configurator (:c:func:`setup_port_config`)
+and a port starter (:c:func:`start_port`).
+
+The table below shows some init examples and there's more info in the examples section.
+
++----------------+--------------------+-----------------------------------------------------+
+| MIDI port type | Use                | Init function                                       |
++================+====================+=====================================================+
+| Input          | Connect to         | .. code-block:: c                                   |
+|                |                    |                                                     |
+|                |                    |    setup_port_config(&port_config, MP_IN);          |
+|                |                    |    start_port(&amidi, port_config);                 |
++----------------+--------------------+-----------------------------------------------------+
+| Output         | Connect to         | .. code-block:: c                                   |
+|                |                    |                                                     |
+|                |                    |    setup_port_config(&port_config, MP_OUT);         |
+|                |                    |    start_port(&amidi, port_config);                 |
++----------------+--------------------+-----------------------------------------------------+
+| Virtual input  | Create an endpoint | .. code-block:: c                                   |
+|                |                    |                                                     |
+|                |                    |    setup_port_config(&port_config, MP_VIRTUAL_IN);  |
+|                |                    |    start_port(&amidi, port_config);                 |
++----------------+--------------------+-----------------------------------------------------+
+| Virtual output | Create an endpoint | .. code-block:: c                                   |
+|                |                    |                                                     |
+|                |                    |    setup_port_config(&port_config, MP_VIRTUAL_OUT); |
+|                |                    |    start_port(&amidi, port_config);                 |
++----------------+--------------------+-----------------------------------------------------+
 
 Installation
 ------------

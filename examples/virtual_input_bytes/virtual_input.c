@@ -11,15 +11,19 @@ MIDI_in_data * input_data;
 MIDI_message * msg;
 error_message * err_msg;
 
+RMR_Port_config * port_config;
+
 int main() {
     //
     prepare_input_data_with_queues(&input_data);
-    // TODO look through each required call
-    start_port(&data, MP_VIRTUAL_IN);
+    // Create a port configuration with default values
+    setup_port_config(&port_config, MP_VIRTUAL_IN);
+    // Start a port with a provided configruation
+    start_port(&data, port_config);
     //
     assign_midi_data(input_data, data);
     // Open a new port with a pre-set name
-    open_virtual_port(data, "Synth", input_data);
+    open_virtual_port(data, "rmr", input_data);
 
     keep_process_running = 1;
 
@@ -41,7 +45,11 @@ int main() {
         }
     }
 
+    // TODO
     destroy_midi_input(data, input_data);
+
+    // Destroy a port configuration
+    destroy_port_config(port_config);
 
     // Exit without an error
     return 0;

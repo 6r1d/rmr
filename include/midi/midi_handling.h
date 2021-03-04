@@ -4,11 +4,13 @@
 #include <sys/time.h>
 #include <glib.h>
 #include "asoundlib.h"
-
+// C-related helpers, unrelated to core structures
 #include "helpers.h"
-#include "typedefs.h"
+// MIDI-related structures
 #include "midi_structures.h"
+// Logging utilities
 #include "logging.h"
+// Error handling utilities
 #include "error_handling.h"
 
 /**
@@ -197,6 +199,7 @@ int init_amidi_data(Alsa_MIDI_data * amidi_data, mp_type_t port_type) {
     return result;
 }
 
+// TODO this is done for ordering only, improve!
 void set_client_name(Alsa_MIDI_data *amidi_data, const char *client_name);
 
 /**
@@ -247,12 +250,13 @@ int init_seq(Alsa_MIDI_data * amidi_data, const char * client_name, mp_type_t po
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param queue_name: a name for a new named queue
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
  *
  * :returns: **0** or **-1** when an error happens
  *
  * :since: v0.1
  */
-int start_input_seq(Alsa_MIDI_data* amidi_data, const char* queue_name) {
+int start_input_seq(Alsa_MIDI_data* amidi_data, const char* queue_name, RMR_Port_config * port_config) {
     int result = 0;
     do {
         // Check if a pipe can be created, set trigger_fds.
@@ -270,9 +274,9 @@ int start_input_seq(Alsa_MIDI_data* amidi_data, const char* queue_name) {
         snd_seq_queue_tempo_t * qtempo;
         snd_seq_queue_tempo_alloca(&qtempo);
         // Set a MIDI tempo for a queue
-        snd_seq_queue_tempo_set_tempo(qtempo, QUEUE_TEMPO);
+        snd_seq_queue_tempo_set_tempo(qtempo, port_config->queue_tempo);
         // Set the amount of pulses per quarter note
-        snd_seq_queue_tempo_set_ppq(qtempo, QUEUE_STATUS_PPQ);
+        snd_seq_queue_tempo_set_ppq(qtempo, port_config->queue_ppq);
         snd_seq_set_queue_tempo(amidi_data->seq, amidi_data->queue_id, qtempo);
         snd_seq_drain_output(amidi_data->seq);
         #endif
@@ -285,13 +289,13 @@ int start_input_seq(Alsa_MIDI_data* amidi_data, const char* queue_name) {
  * Creates a MIDI event parser and a MIDI port.
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
- * :param vport_name: a name to set for a new virtual output port
+ * :param port_name: a name to set for a new virtual output port
  *
  * :returns: **0** on success, **-1** on an error
  *
  * :since: v0.1
  */
-int start_virtual_output_seq(Alsa_MIDI_data * amidi_data, const char * vport_name) {
+int start_virtual_output_seq(Alsa_MIDI_data * amidi_data, const char * port_name) {
     int result = 0;
     do {
         // Create a MIDI event parser with a pre-set buffer size
@@ -305,7 +309,7 @@ int start_virtual_output_seq(Alsa_MIDI_data * amidi_data, const char * vport_nam
         snd_midi_event_init(amidi_data->coder);
         // Open a virtual port
         amidi_data->vport = snd_seq_create_simple_port(
-            amidi_data->seq, vport_name,
+            amidi_data->seq, port_name,
             SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
             SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION
         );
@@ -1258,21 +1262,22 @@ int prepare_input_data_with_queues(MIDI_in_data ** input_data) {
  * A wrapper function for a initializing a virtual output MIDI port.
  *
  * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
  *
  * :returns: **0** on success
  *
  * :since: v0.1
  */
-int start_virtual_output_port(Alsa_MIDI_data **amidi_data) {
+int start_virtual_output_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
     int result = 0;
     // Allocate Alsa_MIDI_data memory
     init_amidi_data_instance(amidi_data);
     // Fill :c:type:`Alsa_MIDI_data` instance
-    init_amidi_data(*amidi_data, MP_VIRTUAL_OUT);
+    init_amidi_data(*amidi_data, port_config->port_type);
     // Open an Alsa seq interface, assign it to :c:type:`Alsa_MIDI_data` instance
-    init_seq(*amidi_data, "Bonsai virtual output", MP_VIRTUAL_OUT);
+    init_seq(*amidi_data, port_config->client_name, port_config->port_type);
     // Open Alsa seq interface with a "virtual output" port
-    start_virtual_output_seq(*amidi_data, "Bonsai seq");
+    start_virtual_output_seq(*amidi_data, port_config->port_name);
     //
     return result;
 }
@@ -1281,19 +1286,20 @@ int start_virtual_output_port(Alsa_MIDI_data **amidi_data) {
  * A wrapper function for starting a non-virtual output port.
  *
  * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
  *
  * :returns: **0** on success
  *
  * :since: v0.1
  */
-int start_output_port(Alsa_MIDI_data ** amidi_data) {
+int start_output_port(Alsa_MIDI_data ** amidi_data, RMR_Port_config * port_config) {
     int result = 0;
     // Allocate Alsa_MIDI_data memory
     init_amidi_data_instance(amidi_data);
     // Fill :c:type:`Alsa_MIDI_data` instance
-    init_amidi_data(*amidi_data, MP_OUT);
+    init_amidi_data(*amidi_data, port_config->port_type);
     // Open an Alsa seq interface, assign it to :c:type:`Alsa_MIDI_data` instance
-    init_seq(*amidi_data, "Bonsai output", MP_OUT);
+    init_seq(*amidi_data, port_config->client_name, port_config->port_type);
     start_output_seq(*amidi_data);
     //
     return result;
@@ -1303,20 +1309,21 @@ int start_output_port(Alsa_MIDI_data ** amidi_data) {
  * A wrapper function for opening a virtual input port
  *
  * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
  *
  * :returns: **0** on success
  *
  * :since: v0.1
  */
-int start_virtual_input_port(Alsa_MIDI_data **amidi_data) {
+int start_virtual_input_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
     int result = 0;
 
     init_amidi_data_instance(amidi_data);
     // Fill :c:type:`Alsa_MIDI_data` struct instance
-    init_amidi_data(*amidi_data, MP_VIRTUAL_IN);
+    init_amidi_data(*amidi_data, port_config->port_type);
     // Open an Alsa seq interface, assign it to :c:type:`Alsa_MIDI_data` instance
-    init_seq(*amidi_data, "Bonsai virtual input", MP_VIRTUAL_IN);
-    start_input_seq(*amidi_data, "Bonsai queue");
+    init_seq(*amidi_data, port_config->client_name, port_config->port_type);
+    start_input_seq(*amidi_data, port_config->queue_name, port_config);
     //
     return result;
 }
@@ -1325,21 +1332,81 @@ int start_virtual_input_port(Alsa_MIDI_data **amidi_data) {
  * A wrapper function for starting a non-virtual input port.
  *
  * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
  *
  * :returns: **0** on success
  *
  * :since: v0.1
  */
-int start_input_port(Alsa_MIDI_data **amidi_data) {
+int start_input_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
     int result = 0;
 
     init_amidi_data_instance(amidi_data);
     // Fill Alsa_MIDI_data struct instance
-    init_amidi_data(*amidi_data, MP_IN);
+    init_amidi_data(*amidi_data, port_config->port_type);
     // Open an Alsa seq interface, assign it to :c:type:`Alsa_MIDI_data` instance
-    init_seq(*amidi_data, "Bonsai input", MP_IN);
-    start_input_seq(*amidi_data, "Bonsai queue");
+    init_seq(*amidi_data, port_config->client_name, port_config->port_type);
+    start_input_seq(*amidi_data, port_config->queue_name, port_config);
 
+    return result;
+}
+
+int reset_port_config(RMR_Port_config * port_config, mp_type_t port_type) {
+    // Set port type in a port config
+    port_config->port_type = port_type;
+    // Queue tempo config, currently needed
+    // for input and virtual input modes only
+    port_config->queue_tempo = QUEUE_TEMPO;
+    port_config->queue_ppq = QUEUE_STATUS_PPQ;
+    // Configure port based on its type
+    port_config->client_name = "N/A";
+    port_config->port_name = "N/A";
+    port_config->queue_name = "N/A";
+    switch(port_type) {
+        case MP_IN:
+                port_config->client_name = "rmr input";
+                port_config->queue_name = "rmr queue";
+                break;
+    	case MP_VIRTUAL_IN:
+                port_config->client_name = "rmr virtual input";
+                port_config->port_name = "rmr queue";
+                break;
+        case MP_OUT:
+                port_config->client_name = "rmr output";
+                break;
+        case MP_VIRTUAL_OUT:
+                port_config->client_name = "rmr virtual output";
+                port_config->port_name = "rmr virtual output port";
+                break;
+        default:
+                break;
+    }
+    return 0;
+}
+
+/**
+ * Allocates memory for an instance of :c:type:`RMR_Port_config`,
+ * sets default values for it
+ *
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
+ *
+ */
+int setup_port_config(RMR_Port_config ** port_config, mp_type_t port_type) {
+    * port_config = NULL;
+    * port_config = malloc(sizeof(RMR_Port_config));
+    int result = reset_port_config(*port_config, port_type);
+    return result;
+}
+
+/**
+ * Deallocates an instance of :c:type:`RMR_Port_config`
+ *
+ * :param port_config: an instance of port configuration (:c:type:`RMR_Port_config`)
+ *
+ */
+int destroy_port_config(RMR_Port_config * port_config) {
+    int result = 0;
+    free(port_config);
     return result;
 }
 
@@ -1348,26 +1415,26 @@ int start_input_port(Alsa_MIDI_data **amidi_data) {
  * TODO add Port_config input.
  *
  * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
- * :param port_type: a port type to use, supports all values for :c:type:`mp_type_t`
+ * :param port_config: an instance of port configuration: :c:type:`RMR_Port_config`
  *
  * :returns: **0** on success
  *
  * :since: v0.1
  */
-int start_port(Alsa_MIDI_data **amidi_data, mp_type_t port_type) {
+int start_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
     int result = 0;
-    switch(port_type) {
+    switch(port_config->port_type) {
         case MP_IN:
-                result = start_input_port(amidi_data);
+                result = start_input_port(amidi_data, port_config);
                 break;
     	case MP_VIRTUAL_IN:
-                result = start_virtual_input_port(amidi_data);
+                result = start_virtual_input_port(amidi_data, port_config);
                 break;
         case MP_OUT:
-                result = start_output_port(amidi_data);
+                result = start_output_port(amidi_data, port_config);
                 break;
         case MP_VIRTUAL_OUT:
-                result = start_virtual_output_port(amidi_data);
+                result = start_virtual_output_port(amidi_data, port_config);
                 break;
         default:
                 result = -1;
@@ -1375,7 +1442,6 @@ int start_port(Alsa_MIDI_data **amidi_data, mp_type_t port_type) {
     }
     return result;
 }
-
 
 /**
  * Finds a complete port name, including both **client info** and **port info**.

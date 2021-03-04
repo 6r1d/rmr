@@ -9,6 +9,8 @@
 
 Alsa_MIDI_data * amidi_data;
 
+RMR_Port_config * port_config;
+
 // Send "note on" or "note off" signal
 bool msg_mode = false;
 // Last recorded time in milliseconds
@@ -18,7 +20,10 @@ int main() {
     // Record initial time to a timer
     timer_msec_last = millis();
 
-    start_port(&amidi_data, MP_VIRTUAL_OUT);
+    // Create a port configuration with default values
+    setup_port_config(&port_config, MP_VIRTUAL_OUT);
+    // Start a port with a provided configruation
+    start_port(&amidi_data, port_config);
 
     // Send out a series of MIDI messages.
     send_midi_message(amidi_data, MIDI_PROGRAM_CHANGE_MSG, 2);
@@ -42,6 +47,9 @@ int main() {
     }
 
     if (destroy_midi_output(amidi_data, NULL) != 0) slog("destructor", "destructor error");
+
+    // Destroy a port configuration
+    destroy_port_config(port_config);
 
     // Exit without an error
     return 0;

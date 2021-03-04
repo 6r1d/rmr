@@ -10,6 +10,8 @@
 Alsa_MIDI_data * data;
 MIDI_port * current_midi_port;
 
+RMR_Port_config * port_config;
+
 // Send "note on" or "note off" signal
 bool msg_mode = false;
 // Last recorded time in milliseconds
@@ -19,14 +21,17 @@ int main() {
     // Record initial time to a timer
     timer_msec_last = millis();
 
-    start_port(&data, MP_OUT);
+    // Create a port configuration with default values
+    setup_port_config(&port_config, MP_VIRTUAL_OUT);
+    // Start a port with a provided configruation
+    start_port(&data, port_config);
 
     // Allocate memory for a midi port struct to fill TODO elaborate
     init_midi_port(&current_midi_port);
 
     // Count the MIDI ports,
     // open if a port containing a certain word is available
-    if (find_midi_port(data, current_midi_port, "Bonsai", true) > 0) {
+    if (find_midi_port(data, current_midi_port, "rmr", true) > 0) {
         print_midi_port(current_midi_port);
         open_port(false, data, current_midi_port->id, current_midi_port->port_info_name, NULL);
         keep_process_running = 1;
@@ -53,6 +58,9 @@ int main() {
     }
 
     if (destroy_midi_output(data, NULL) != 0) slog("destructor", "destructor error");
+
+    // Destroy a port configuration
+    destroy_port_config(port_config);
 
     // Exit without an error
     return 0;

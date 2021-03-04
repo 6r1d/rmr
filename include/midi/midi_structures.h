@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <pthread.h>
-#include "asoundlib.h"
 #include <glib.h>
+#include "asoundlib.h"
+#include "typedefs.h"
 
 /**
  * A constant that defines a maximum port name length
@@ -10,7 +11,7 @@
 #define MAX_PORT_NAME_LEN 128
 
 /**
- * A custom structure that contains names
+ * A structure that contains names
  * and numbers related to a certain MIDI
  * port in Alsa.
  */
@@ -33,10 +34,20 @@ typedef struct MIDI_port {
     int port_info_id;
 } MIDI_port;
 
-typedef struct Port_config {
-    const char * seq_name;
-    const char * virtual_seq_name;
-} Port_config;
+/**
+ * A structure that initializes a port.
+ * It contains a port type, names for seq interface, queue tempo and ppq for input queues.
+ */
+typedef struct RMR_Port_config {
+    mp_type_t port_type;
+    const char * client_name;
+    const char * port_name;
+    const char * queue_name;
+    // Look at snd_seq_queue_tempo_set_tempo for the reference
+    unsigned int queue_tempo;
+    // Look at snd_seq_queue_tempo_set_ppq for the reference
+    int queue_ppq;
+} RMR_Port_config;
 
 /**
  * A struct to store a single MIDI message in a form of
