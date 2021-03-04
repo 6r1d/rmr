@@ -839,6 +839,7 @@ int send_midi_message(Alsa_MIDI_data * amidi_data, const unsigned char * message
 
 /**
  * Finds a MIDI port (port) by a given substring.
+ * Matches a substring in :c:member:`MIDI_port.client_info_name` attribute.
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param port: :c:type:`MIDI_port` instance
@@ -901,7 +902,6 @@ int find_midi_port(
             );
             port->port_info_client_id = current_midi_port->port_info_client_id;
             port->port_info_id = current_midi_port->port_info_id;
-            printf("%d %d\n", port->port_info_client_id, port->port_info_id);
             result = 1;
             free(current_midi_port);
             break;

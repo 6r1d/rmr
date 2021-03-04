@@ -7,7 +7,7 @@
 /**
  * A constant that defines a maximum port name length
  */
-#define MAX_PORT_NAME_LEN 64
+#define MAX_PORT_NAME_LEN 128
 
 /**
  * A custom structure that contains names
