@@ -22,7 +22,7 @@ copyright = '2021, 6r1d'
 author = '6r1d'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '0.1.5'
 
 
 # -- General configuration ---------------------------------------------------

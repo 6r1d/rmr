@@ -379,8 +379,9 @@ int start_output_seq(Alsa_MIDI_data * amidi_data) {
  *              :c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE`
  * :param port_number: use -1 for counting ports and a port number to get port info (in that case a function returns 1).
  *
- * :returns: port ID, 1 when a port number is provided,
- *           0 otherwise
+ * :returns: port ID when a port is found,
+ *           1 when a port ID is provided,
+ *           0 when a port ID is not found
  */
 unsigned int port_info(
     snd_seq_t * seq,
