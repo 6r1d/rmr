@@ -390,7 +390,7 @@ unsigned int port_info(
     int port_number
   ) {
     snd_seq_client_info_t *cinfo;
-    int client;
+    int client_id;
     int count = 0;
     // Allocate a snd_seq_client_info_t container on stack
     snd_seq_client_info_alloca(&cinfo);
@@ -398,11 +398,13 @@ unsigned int port_info(
     snd_seq_client_info_set_client(cinfo, -1);
     // Query the next client
     while (snd_seq_query_next_client(seq, cinfo) >= 0) {
-        client = snd_seq_client_info_get_client(cinfo);
-        if (client == 0) continue;
-        // Reset query info
-        snd_seq_port_info_set_client(pinfo, client);
-        snd_seq_port_info_set_port( pinfo, -1 );
+        // Get client id of a client_info container
+        client_id = snd_seq_client_info_get_client(cinfo);
+        if (client_id == 0) continue;
+        // Fill the client id of a port_info container from the function arguments
+        snd_seq_port_info_set_client(pinfo, client_id);
+        // Fill the port id of a port_info container from the function arguments
+        snd_seq_port_info_set_port(pinfo, -1);
         while (snd_seq_query_next_port( seq, pinfo ) >= 0) {
             unsigned int atyp = snd_seq_port_info_get_type(pinfo);
             if ( ( ( atyp & SND_SEQ_PORT_TYPE_MIDI_GENERIC ) == 0 ) &&
@@ -993,9 +995,14 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
         if (in) {
             snd_seq_port_info_alloca(&pinfo);
             if (amidi_data->vport < 0) {
-                snd_seq_port_info_set_client( pinfo, 0 );
-                snd_seq_port_info_set_port( pinfo, 0 );
-                // Set the capability bits of a port_info container
+                // Set the client id of a port_info container
+                // allocated in this function
+                snd_seq_port_info_set_client(pinfo, 0);
+                // Set the port id of a port_info container
+                // allocated in this function
+                snd_seq_port_info_set_port(pinfo, 0);
+                // Set the capability bits of a
+                // port_info container
                 snd_seq_port_info_set_capability( pinfo, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE );
                 snd_seq_port_info_set_type( pinfo, SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION );
                 snd_seq_port_info_set_midi_channels(pinfo, 16);
