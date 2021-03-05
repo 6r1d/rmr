@@ -1153,7 +1153,7 @@ void close_port(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data, int mode
 }
 
 /**
- * Destroys a MIDI output port.
+ * Destroys a MIDI output port: closes a port connection and performs a cleanup.
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param input_data: :c:type:`MIDI_in_data` instance
@@ -1178,7 +1178,8 @@ int destroy_midi_output(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data) 
 }
 
 /**
- * Destroys a MIDI input port.
+ * Destroys a MIDI input port:
+ * closes a port connection, shuts the input thread down, performs cleanup / deallocations.
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param input_data: :c:type:`MIDI_in_data` instance
