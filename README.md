@@ -6,15 +6,11 @@
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/6r1d/rmr.svg)](http://isitmaintained.com/project/6r1d/rmr "Percentage of issues still open")
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/6r1d/rmr.svg)](https://isitmaintained.com/project/6r1d/rmr "Average time to resolve an issue")
 
-# RMR: RtMIDI, reduced
-
 Hello and welcome to RMR's readme.
 
-This is a simplified rewrite of [RtMIDI](https://github.com/thestk/rtmidi)'s Alsa part: C++ → C + GLib library.
+RMR or "RtMIDI, reduced" is a simplified rewrite of [RtMIDI](https://github.com/thestk/rtmidi)'s Alsa part: C++ → C + GLib library.
 It allows to interface C programs using [MIDI](https://en.wikipedia.org/wiki/MIDI) standard.
-API calls and struct members **are different** from [RtMIDI](https://github.com/thestk/rtmidi).
-
-This is my personal, derivative project, although I'd be happy if you discuss it with me in [issues](https://github.com/6r1d/rmr/issues), recommend code improvements, etc.
+There is no compatibility with API calls and struct members from [RtMIDI](https://github.com/thestk/rtmidi).
 
 **Warning**: I might change API a lot, this project **is not stable**. Use RMR at your own risk.
 
@@ -24,8 +20,10 @@ This is my personal, derivative project, although I'd be happy if you discuss it
 
 ## Motivation
 
-* I want to use RMR on Linux embedded devices and learn more about [MIDI](https://en.wikipedia.org/wiki/MIDI) and [Alsa](https://www.alsa-project.org/wiki/Main_Page) while changing the code
-* I want to know the library internals well when I am using it so it can be as predictable for me as possible
+This is my personal, derivative project. I want to use RMR on Linux embedded devices and learn more about [MIDI](https://en.wikipedia.org/wiki/MIDI) and [Alsa](https://www.alsa-project.org/wiki/Main_Page) while changing the code.
+I also want to know the library internals well when I am using it so it can be as predictable for me as possible.
+
+It will be great if you will discuss it with me in [issues](https://github.com/6r1d/rmr/issues), recommend code improvements, etc.
 
 ## Changes
 
