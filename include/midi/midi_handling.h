@@ -379,8 +379,8 @@ int start_output_seq(Alsa_MIDI_data * amidi_data) {
  *              :c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE`
  * :param port_number: use -1 for counting ports and a port number to get port info (in that case a function returns 1).
  *
- * :returns: port ID when a port is found,
- *           1 when a port ID is provided,
+ * :returns: port count (or the amount of ports) when a negative port_number value is provided,
+ *           1 when a port ID is provided and the port is found,
  *           0 when a port ID is not found
  */
 unsigned int port_info(
@@ -1153,7 +1153,7 @@ void close_port(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data, int mode
 }
 
 /**
- * Destroys a MIDI output port.
+ * Destroys a MIDI output port: closes a port connection and performs a cleanup.
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param input_data: :c:type:`MIDI_in_data` instance
@@ -1178,7 +1178,8 @@ int destroy_midi_output(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data) 
 }
 
 /**
- * Destroys a MIDI input port.
+ * Destroys a MIDI input port:
+ * closes a port connection, shuts the input thread down, performs cleanup / deallocations.
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param input_data: :c:type:`MIDI_in_data` instance

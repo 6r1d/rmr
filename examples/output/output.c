@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <unistd.h> // usleep
-#include <time.h>   // nanosleep
+// Needed for usleep
+#include <unistd.h>
+// Needed for nanosleep
+#include <time.h>
+// Main RMR header file
 #include "midi/midi_handling.h"
+// Keeps process running until Ctrl-C is pressed.
+// Contains a SIGINT handler and keep_process_running variable.
 #include "util/exit_handling.h"
 #include "util/timing.h"
 #include "test_data.h"
@@ -26,7 +31,7 @@ int main() {
     // Start a port with a provided configruation
     start_port(&data, port_config);
 
-    // Allocate memory for a midi port struct to fill TODO elaborate
+    // Allocate memory for a MIDI_port instance
     init_midi_port(&current_midi_port);
 
     // Count the MIDI ports,
@@ -34,6 +39,8 @@ int main() {
     if (find_midi_port(data, current_midi_port, "rmr", true) > 0) {
         print_midi_port(current_midi_port);
         open_port(false, data, current_midi_port->id, current_midi_port->port_info_name, NULL);
+        // Don't exit until Ctrl-C is pressed;
+        // Look up "output_handling.h"
         keep_process_running = 1;
     }
 
@@ -41,14 +48,17 @@ int main() {
     send_midi_message(data, MIDI_PROGRAM_CHANGE_MSG, 2);
     send_midi_message(data, MIDI_CONTROL_CHANGE_MSG, 3);
 
-    // Add SIGINT handler
+    // Add a SIGINT handler to set keep_process_running to 0
+    // so the program can exit
     signal(SIGINT, sigint_handler);
 
-    // Generate notes until SIGINT
+    // Run until SIGINT is received
     while (keep_process_running) {
         if (millis() - timer_msec_last > 100.) {
             timer_msec_last = millis();
+            // Send a Note On message
             if (msg_mode) send_midi_message(data, MIDI_NOTE_ON_MSG, 3);
+            // Send a Note Off message
             else          send_midi_message(data, MIDI_NOTE_OFF_MSG, 3);
             printf("mode: %d\n", msg_mode);
             msg_mode = !msg_mode;
@@ -57,6 +67,8 @@ int main() {
         }
     }
 
+    // Destroy a MIDI output port:
+    // close a port connection and perform a cleanup.
     if (destroy_midi_output(data, NULL) != 0) slog("destructor", "destructor error");
 
     // Destroy a port configuration
