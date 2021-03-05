@@ -1200,7 +1200,7 @@ int destroy_midi_input(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data) {
     // Close port connection if it exists
     close_port(amidi_data, input_data, SND_SEQ_OPEN_OUTPUT);
     // Shutdown the input thread.
-    if ( input_data->do_input ) {
+    if (input_data != NULL && input_data->do_input) {
         input_data->do_input = false;
         int res = write(amidi_data->trigger_fds[1], &input_data->do_input, sizeof(input_data->do_input));
         (void) res;
