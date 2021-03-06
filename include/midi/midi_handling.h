@@ -295,7 +295,11 @@ int start_input_seq(
 }
 
 /**
- * Creates a MIDI event parser and a MIDI port.
+ * Creates a MIDI event parser, a virtual port for virtual mode
+ * and allocates a buffer for normal mode.
+ *
+ * TODO pick a new name, considering calls to snd_midi_event_new, snd_midi_event_init,
+ * snd_seq_create_simple_port (virtual mode) and malloc for amidi_data->buffer (normal mode).
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param port_name: a name to set for a new virtual output port
@@ -304,7 +308,7 @@ int start_input_seq(
  *
  * :since: v0.1
  */
-int start_virtual_output_seq(Alsa_MIDI_data * amidi_data, const char * port_name) {
+int prepare_output(bool is_virtual, Alsa_MIDI_data * amidi_data, const char * port_name) {
     int result = 0;
     do {
         // Create a MIDI event parser with a pre-set buffer size
@@ -312,60 +316,44 @@ int start_virtual_output_seq(Alsa_MIDI_data * amidi_data, const char * port_name
             result = -1;
             free(amidi_data);
             slog("MIDI out", "error initializing MIDI event parser.");
-            break;
-        }
-        // Reset encoder and decoder of the MIDI event parser
-        snd_midi_event_init(amidi_data->coder);
-        // Open a virtual port
-        amidi_data->vport = snd_seq_create_simple_port(
-            amidi_data->seq, port_name,
-            SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
-            SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION
-        );
-        // Throw an error
-        if (amidi_data->vport < 0) {
-            result = -1;
-            free(amidi_data);
-            slog("MIDI out", "error creating virtual port.");
-            break;
-        }
-    }
-    while(0);
-    return result;
-}
-
-/**
- * Create a MIDI event parser for MIDI output, reset it.
- * Used by **start_output_port**.
- *
- * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
- *
- * :returns: **0** on success, **-1** on an error
- *
- * :since: v0.1
- */
-int start_output_seq(Alsa_MIDI_data * amidi_data) {
-    int result = 0;
-    do {
-        // Create a MIDI event parser with a pre-set buffer size
-        if (snd_midi_event_new(amidi_data->buffer_size, &amidi_data->coder) < 0) {
-            result = -1;
-            free(amidi_data);
-            slog("MIDI out", "error initializing MIDI event parser.");
-            break;
-        }
-        // Allocate buffer memory using buffer_size
-        amidi_data->buffer = (unsigned char *) malloc( amidi_data->buffer_size );
-        if (amidi_data->buffer == NULL) {
-            result = -1;
-            free(amidi_data);
-            slog("MIDI out", "error allocating buffer memory.");
             break;
         }
         // Reset MIDI encode/decode parsers
         snd_midi_event_init(amidi_data->coder);
+
+        if (is_virtual) {
+            // Check port_name is not null
+            if (port_name == NULL) {
+                slog("MIDI out", "error creating virtual output port, name is empty.");
+                break;
+            }
+            // Open a virtual port
+            amidi_data->vport = snd_seq_create_simple_port(
+                amidi_data->seq, port_name,
+                SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
+                SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION
+            );
+            // Throw an error if there's a negative error code instead of a port number
+            if (amidi_data->vport < 0) {
+                result = -1;
+                free(amidi_data);
+                slog("MIDI out", "error creating virtual output port.");
+                break;
+            }
+        } else {
+            // Allocate buffer memory using buffer_size
+            amidi_data->buffer = (unsigned char *) malloc(amidi_data->buffer_size);
+            // Throw an error on buffer alocation failure
+            if (amidi_data->buffer == NULL) {
+                result = -1;
+                free(amidi_data);
+                slog("MIDI out", "error allocating buffer memory.");
+                break;
+            }
+        }
     }
     while(0);
+
     return result;
 }
 
@@ -1296,7 +1284,7 @@ int start_virtual_output_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * por
     // Open an Alsa seq interface, assign it to :c:type:`Alsa_MIDI_data` instance
     init_seq(*amidi_data, port_config->client_name, port_config->port_type);
     // Open Alsa seq interface with a "virtual output" port
-    start_virtual_output_seq(*amidi_data, port_config->port_name);
+    prepare_output(true, *amidi_data, port_config->port_name);
     //
     return result;
 }
@@ -1319,7 +1307,7 @@ int start_output_port(Alsa_MIDI_data ** amidi_data, RMR_Port_config * port_confi
     init_amidi_data(*amidi_data, port_config->port_type);
     // Open an Alsa seq interface, assign it to :c:type:`Alsa_MIDI_data` instance
     init_seq(*amidi_data, port_config->client_name, port_config->port_type);
-    start_output_seq(*amidi_data);
+    prepare_output(false, *amidi_data, 0);
     //
     return result;
 }
