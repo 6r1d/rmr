@@ -368,6 +368,8 @@ int prepare_output(bool is_virtual, Alsa_MIDI_data * amidi_data, const char * po
  *              :c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE`
  * :param port_number: use -1 for counting ports and a port number to get port info (in that case a function returns 1).
  *
+ * TODO do we query a client number, not a port number? We are using snd_seq_query_next_client.
+ *
  * :returns: port count (or the amount of ports) when a negative port_number value is provided,
  *           1 when a port ID is provided and the port is found,
  *           0 when a port ID is not found
@@ -1488,7 +1490,7 @@ int start_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
  *
  * :since: v0.1
  */
-int get_full_port_name(const char * port_name, unsigned int port_number, Alsa_MIDI_data * amidi_data, bool in) {
+int get_full_port_name(char * port_name, unsigned int port_number, Alsa_MIDI_data * amidi_data, bool in) {
   int result = 0;
   int32_t port_mode;
 
@@ -1500,21 +1502,20 @@ int get_full_port_name(const char * port_name, unsigned int port_number, Alsa_MI
   snd_seq_client_info_alloca(&cinfo);
   snd_seq_port_info_alloca(&pinfo);
 
-  static char string_name[512];
+  if (in) port_mode = SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
+  else    port_mode = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
 
-  if (in) port_mode = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
-  else    port_mode = SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
+  int port_info_result = port_info(amidi_data->seq, pinfo, port_mode, (int) port_number);
 
-  unsigned int port_id = port_info(amidi_data->seq, pinfo, port_mode, (int) port_number);
-
-  if (port_id) {
+  if (port_info_result > 0) {
     // Get client id of a port_info container
     int cnum = snd_seq_port_info_get_client(pinfo);
     // Obtain the information of the given client
     snd_seq_get_any_client_info(amidi_data->seq, cnum, cinfo);
+
     // Generate a full port name
     sprintf(
-        string_name,
+        port_name,
         "%s:%s %d:%d",
         snd_seq_client_info_get_name(cinfo),
         snd_seq_port_info_get_name(pinfo),
@@ -1523,7 +1524,7 @@ int get_full_port_name(const char * port_name, unsigned int port_number, Alsa_MI
         snd_seq_port_info_get_client(pinfo),
         snd_seq_port_info_get_port(pinfo)
     );
-    port_name = string_name;
+
     return result;
   }
 
