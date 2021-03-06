@@ -1479,8 +1479,10 @@ int start_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
  * :param port_name: a const char pointer pointing to a string to be filled
  * :param port_number: a number of a port to look for
  * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
- * :param in: defines if a function is looking for "SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ" or
- *            "SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE" capabilities
+ * :param in: defines if a function is looking for
+ *            :c:data:`SND_SEQ_PORT_CAP_READ` | :c:data:`SND_SEQ_PORT_CAP_SUBS_READ`
+ *            or
+ *            :c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE` capabilities
  *
  * :returns: **0** on success, **-1** when a MIDI port is not found.
  *
