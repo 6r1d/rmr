@@ -301,6 +301,7 @@ int start_input_seq(
  * TODO pick a new name, considering calls to snd_midi_event_new, snd_midi_event_init,
  * snd_seq_create_simple_port (virtual mode) and malloc for amidi_data->buffer (normal mode).
  *
+ * :param is_virtual: should the function create normal output port or a virtual one?
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param port_name: a name to set for a new virtual output port
  *
