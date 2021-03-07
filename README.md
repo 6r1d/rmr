@@ -49,5 +49,5 @@ Initially, I wanted it to have the same non-binding license clause, but that way
 
 ## Other great [RtMIDI](https://github.com/thestk/rtmidi) forks
 
-There are other [RtMIDI](https://github.com/thestk/rtmidi) forks like [RtMIDI17](https://github.com/jcelerier/RtMidi17) for [C++17](https://en.wikipedia.org/wiki/C%2B%2B17).
-
+* [RtMIDI17](https://github.com/jcelerier/RtMidi17): [C++17](https://en.wikipedia.org/wiki/C%2B%2B17)
+* [libremidi](https://github.com/jcelerier/libremidi): [C++17](https://en.wikipedia.org/wiki/C%2B%2B17), based on RtMIDI and [ModernMIDI](https://github.com/ddiakopoulos/modern-midi), [should handle](https://github.com/thestk/rtmidi/issues/214#issuecomment-792327899) large SysEx messages better
