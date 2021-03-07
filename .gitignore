@@ -7,3 +7,7 @@ examples/virtual_input_detailed/virtual_input
 test/set_client_name/main
 test/set_port_name/main
 test/test_last_bytearray_byte/main
+examples/get_full_port_name/get_full_port_name
+examples/input_bytes_callback/input
+examples/virtual_input_callback/virtual_input
+
