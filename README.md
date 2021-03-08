@@ -31,6 +31,7 @@ It will be great if you will discuss it with me in [issues](https://github.com/6
 * use [GLib](https://developer.gnome.org/glib/stable) [asynchronous queues](https://developer.gnome.org/glib/stable/glib-Asynchronous-Queues.html) and [arrays](https://developer.gnome.org/glib/stable/glib-Arrays.html) when needed (mostly input code: arrays for variably sized SysEx messages and queues for inter-thread message passing)
 * removed [OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) parts and use structs to reduce overhead
 * changed [OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) methods to simple functions to reduce overhead
+* currently uses `do {} while (0);` for error handling in many cases
 * use of `GNU make` for examples and tests
 * documentation using Sphinx and Hawkmoth
 
