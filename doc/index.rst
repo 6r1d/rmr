@@ -23,6 +23,7 @@ Contents
    errors
    feature_translation
    rewrite_changes
+   plans
 
 Indices and tables
 ==================
