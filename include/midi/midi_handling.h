@@ -851,73 +851,88 @@ int send_midi_message(Alsa_MIDI_data * amidi_data, const unsigned char * message
  *
  * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param port: :c:type:`MIDI_port` instance
+ * :param port_type: a port type for a sequencer, supports all values for :c:type:`mp_type_t`,
+ *                   distinguishes only between "input" and "output", so a virtual input will still be "an input"
  * :param substr: a port substring
- * :param write: do we look for a port we write into or read from?
  *
- * :returns: **1** when a port was found, **-1** on an error
+ * :returns: **1** when a port was found, **-1** on an error, **-2** when an invalid port type was provided
  *
  * :since: v0.1
  */
 int find_midi_port(
   Alsa_MIDI_data * amidi_data,
   MIDI_port * port,
-  const char * substr,
-  bool write
+  mp_type_t port_type,
+  const char * substr
 ) {
     int result = -1;
     unsigned int port_count;
-    if (!write) {
-        port_count = get_midi_port_count(
-            amidi_data,
-            SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ
-        );
-    } else {
-        port_count = get_midi_port_count(
-            amidi_data,
-            SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE
-        );
-    }
-    unsigned int port_idx;
-    MIDI_port * current_midi_port = 0;
-    for (port_idx = 0; port_idx < port_count; port_idx++) {
-        current_midi_port = malloc(sizeof (MIDI_port));
-        if (!write) {
-            get_port_descriptor_by_id(
-                current_midi_port,
+
+    do {
+        // Find the port count by its capabilities,
+        // exit with an error otherwise
+        if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+            port_count = get_midi_port_count(
                 amidi_data,
-                port_idx,
                 SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ
             );
-        } else {
-            get_port_descriptor_by_id(
-                current_midi_port,
+        }
+        else if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+            port_count = get_midi_port_count(
                 amidi_data,
-                port_idx,
                 SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE
             );
         }
-        if (strstr(current_midi_port->client_info_name, substr) != NULL) {
-            port->id = current_midi_port->id;
-            strncpy(
-              port->client_info_name,
-              current_midi_port->client_info_name,
-              MAX_PORT_NAME_LEN - 1
-            );
-            strncpy(
-              port->port_info_name,
-              current_midi_port->port_info_name,
-              MAX_PORT_NAME_LEN - 1
-            );
-            port->port_info_client_id = current_midi_port->port_info_client_id;
-            port->port_info_id = current_midi_port->port_info_id;
-            result = 1;
-            free(current_midi_port);
+        else {
+            result = -2;
             break;
-        } else {
-            // Free the memory IF we don't need MIDI_port instance later
-            free(current_midi_port);
         }
-    }
+        unsigned int port_idx;
+        MIDI_port * current_midi_port = 0;
+        for (port_idx = 0; port_idx < port_count; port_idx++) {
+            current_midi_port = malloc(sizeof (MIDI_port));
+            // Throw an error if any other port type is possible
+            // and this code is reused elsewhere!
+            if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+                get_port_descriptor_by_id(
+                    current_midi_port,
+                    amidi_data,
+                    port_idx,
+                    SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ
+                );
+            }
+            else if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+                get_port_descriptor_by_id(
+                    current_midi_port,
+                    amidi_data,
+                    port_idx,
+                    SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE
+                );
+            }
+            if (strstr(current_midi_port->client_info_name, substr) != NULL) {
+                port->id = current_midi_port->id;
+                strncpy(
+                  port->client_info_name,
+                  current_midi_port->client_info_name,
+                  MAX_PORT_NAME_LEN - 1
+                );
+                strncpy(
+                  port->port_info_name,
+                  current_midi_port->port_info_name,
+                  MAX_PORT_NAME_LEN - 1
+                );
+                port->port_info_client_id = current_midi_port->port_info_client_id;
+                port->port_info_id = current_midi_port->port_info_id;
+                result = 1;
+                free(current_midi_port);
+                break;
+            } else {
+                // Free the memory IF we don't need MIDI_port instance later
+                free(current_midi_port);
+            }
+        }
+    } while (0);
+
     return result;
 }
 
@@ -1480,17 +1495,22 @@ int start_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
  *
  * :param port_name: a const char pointer pointing to a string to be filled
  * :param port_number: a number of a port to look for
- * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
- * :param in: defines if a function is looking for
+ * :param port_type: supports all values for :c:type:`mp_type_t`, used to select
  *            :c:data:`SND_SEQ_PORT_CAP_READ` | :c:data:`SND_SEQ_PORT_CAP_SUBS_READ`
  *            or
- *            :c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE` capabilities
+ *            :c:data:`SND_SEQ_PORT_CAP_WRITE` | :c:data:`SND_SEQ_PORT_CAP_SUBS_WRITE`
+ *            port capabilities
+ * :param amidi_data: a double pointer to :c:type:`Alsa_MIDI_data` instance
  *
- * :returns: **0** on success, **-1** when a MIDI port is not found.
+ * :returns:
+ *   **0** on success,
+ *   **-1** when port_name is a null pointer,
+ *   **-2** when incorrect value was passed for port_type argument,
+ *   **-3** when port wasn't found.
  *
  * :since: v0.1
  */
-int get_full_port_name(char * port_name, unsigned int port_number, Alsa_MIDI_data * amidi_data, bool in) {
+int get_full_port_name(char * port_name, unsigned int port_number, mp_type_t port_type, Alsa_MIDI_data * amidi_data) {
   int result = 0;
   int32_t port_mode;
 
@@ -1498,37 +1518,51 @@ int get_full_port_name(char * port_name, unsigned int port_number, Alsa_MIDI_dat
   snd_seq_client_info_t *cinfo;
   // Port info container
   snd_seq_port_info_t *pinfo;
-  // Allocate memory for *cinfo and *pinfo.
-  snd_seq_client_info_alloca(&cinfo);
-  snd_seq_port_info_alloca(&pinfo);
 
-  if (in) port_mode = SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
-  else    port_mode = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
+  do {
+      // Do not allow empty port_name pointers
+      if (port_name == NULL) {
+          result = -1;
+          break;
+      }
 
-  int port_info_result = port_info(amidi_data->seq, pinfo, port_mode, (int) port_number);
+      if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+          port_mode = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
+      }
+      else if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+          port_mode = SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
+      }
+      else {
+          result = -2;
+          break;
+      }
 
-  if (port_info_result > 0) {
-    // Get client id of a port_info container
-    int cnum = snd_seq_port_info_get_client(pinfo);
-    // Obtain the information of the given client
-    snd_seq_get_any_client_info(amidi_data->seq, cnum, cinfo);
+      // Allocate memory for *cinfo and *pinfo.
+      snd_seq_client_info_alloca(&cinfo);
+      snd_seq_port_info_alloca(&pinfo);
 
-    // Generate a full port name
-    sprintf(
-        port_name,
-        "%s:%s %d:%d",
-        snd_seq_client_info_get_name(cinfo),
-        snd_seq_port_info_get_name(pinfo),
-        // These lines added to make sure devices are listed
-        // with full portnames added to ensure individual device names
-        snd_seq_port_info_get_client(pinfo),
-        snd_seq_port_info_get_port(pinfo)
-    );
+      int port_info_result = port_info(amidi_data->seq, pinfo, port_mode, (int) port_number);
 
-    return result;
-  }
+      if (port_info_result > 0) {
+          // Get client id of a port_info container
+          int cnum = snd_seq_port_info_get_client(pinfo);
+          // Obtain the information of the given client
+          snd_seq_get_any_client_info(amidi_data->seq, cnum, cinfo);
+          // Generate a full port name
+          sprintf(
+              port_name,
+              "%s:%s %d:%d",
+              snd_seq_client_info_get_name(cinfo),
+              snd_seq_port_info_get_name(pinfo),
+              // These lines added to make sure devices are listed
+              // with full portnames added to ensure individual device names
+              snd_seq_port_info_get_client(pinfo),
+              snd_seq_port_info_get_port(pinfo)
+          );
+          break;
+      }
+      result = -3;
+  } while(0);
 
-  // Port match was not found
-  result = -1;
   return result;
 }

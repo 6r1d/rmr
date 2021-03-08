@@ -46,7 +46,13 @@ Port capabilities in RtMIDI might've been inverted, and I think that I have inve
 
 "SND_SEQ_PORT_CAP_WRITE" is defined as "writable to this port", too.
 
-Does it mean RtMIDI's "getPortName" did not work in a recent release, or am I wrong somewhere?..
+**UPD**: I have changed "in" variable type from bool to a "mp_type_t". I renamed it to "port_type", too.
+And it did not work with input until I changed arguments back. Now it all makes even less sense.
+It finds both "virtual input" and "virtual output" values.
+
+It's strange to think about, but maybe I understood boolean function arguments incorrectly?
+
+**UPD 2**: I was wrong about the arguments, I changed them to less nonsensical ones, it all works better now. I think.
 
 Architectural changes
 ---------------------

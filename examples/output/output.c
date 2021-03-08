@@ -36,7 +36,7 @@ int main() {
 
     // Count the MIDI ports,
     // open if a port containing a certain word is available
-    if (find_midi_port(data, current_midi_port, "rmr", true) > 0) {
+    if (find_midi_port(data, current_midi_port, MP_VIRTUAL_IN, "rmr") > 0) {
         print_midi_port(current_midi_port);
         open_port(false, data, current_midi_port->id, current_midi_port->port_info_name, NULL);
         // Don't exit until Ctrl-C is pressed;
