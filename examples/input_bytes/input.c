@@ -36,7 +36,7 @@ int main() {
     // open if a port containing "Synth" is available
     if (find_midi_port(data, current_midi_port, MP_VIRTUAL_OUT, "rmr") > 0) {
         print_midi_port(current_midi_port);
-        open_port(true, data, current_midi_port->id, current_midi_port->port_info_name, input_data);
+        open_port(MP_IN, current_midi_port->id, current_midi_port->port_info_name, data, input_data);
         // Don't exit until Ctrl-C is pressed;
         // Look up "output_handling.h"
         keep_process_running = 1;

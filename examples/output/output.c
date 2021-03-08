@@ -38,7 +38,7 @@ int main() {
     // open if a port containing a certain word is available
     if (find_midi_port(data, current_midi_port, MP_VIRTUAL_IN, "rmr") > 0) {
         print_midi_port(current_midi_port);
-        open_port(false, data, current_midi_port->id, current_midi_port->port_info_name, NULL);
+        open_port(MP_OUT, current_midi_port->id, current_midi_port->port_info_name, data, NULL);
         // Don't exit until Ctrl-C is pressed;
         // Look up "output_handling.h"
         keep_process_running = 1;

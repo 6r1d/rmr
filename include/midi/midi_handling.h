@@ -938,44 +938,70 @@ int find_midi_port(
 
 /**
  * Opens a MIDI port by its number.
+ * Converted from two RtMIDI methods, initially accepted boolean pointing if it's input.
  *
- * :param in: should the function look for input or output ports?
- * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
+ * **TODO** read all calls in a function and decide if it really makes sense for port_type not to be inverted.
+ *
+ * :param port_type: a port type for a opening, supports all values for :c:type:`mp_type_t`,
+ *                   currently expects MP_IN or MP_VIRTUAL_IN in input context
  * :param port_number: number of a port to look for
  * :param port_name: a name of a port to set using :c:func:`snd_seq_port_info_set_name`
+ * :param amidi_data: :c:type:`Alsa_MIDI_data` instance
  * :param input_data: a :c:type:`MIDI_in_data` instance
  *
  * :returns: **0** on success, **-1** on an error
  *
  * :since: v0.1
  */
-int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, const char *port_name, MIDI_in_data * input_data) {
+int open_port(mp_type_t port_type, unsigned int port_number, const char *port_name, Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data) {
     snd_seq_port_info_t * pinfo;
     snd_seq_addr_t sender, receiver;
     unsigned int midi_port_count;
     int32_t port_mode;
     int result = 0;
     do {
-        // Null pointer check
-        if (in && !input_data) {
+        // Exit with an error if a port_type value is wrong
+        if (
+            !(
+                port_type == MP_IN || port_type == MP_VIRTUAL_IN ||
+                port_type == MP_OUT || port_type == MP_VIRTUAL_OUT
+            )
+        ) {
+            result = -1;
+            break;
+        }
+        // Null pointer check for input_data argument
+        if ((port_type == MP_IN || port_type == MP_VIRTUAL_IN) && !input_data) {
             slog("Alsa MIDI in", "got a NULL pointer for input_data argument in open_port function.");
             result = -1;
         }
         // Throw an error if a port is already open
         if (amidi_data->port_connected) {
-            if (in) slog("Alsa MIDI in", "opening an input port: a valid connection already exists.");
-            else slog("Alsa MIDI out", "opening an output port: a valid connection already exists.");
+            if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+                slog("Alsa MIDI in", "opening an input port: a valid connection already exists.");
+            }
+            else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+                slog("Alsa MIDI out", "opening an output port: a valid connection already exists.");
+            }
             result = -1;
         }
         // Set port mode (read or write) in seq's format
-        if (in) port_mode = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
-        else    port_mode = SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
+        if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+            port_mode = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
+        }
+        else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+            port_mode = SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
+        }
         // Count MIDI ports for a selected mode
         midi_port_count = get_midi_port_count(amidi_data, port_mode);
         // Throw an error if no ports are found
         if (midi_port_count < 1) {
-            if (in) slog("Alsa MIDI in",  "no MIDI input sources found while opening a port.");
-            else    slog("Alsa MIDI out", "no MIDI output sources found while opening a port.");
+            if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+                slog("Alsa MIDI in",  "no MIDI input sources found while opening a port.");
+            }
+            else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+                slog("Alsa MIDI out", "no MIDI output sources found while opening a port.");
+            }
             result = -1;
         }
         // Allocate a snd_seq_port_info_t port information container on stack
@@ -983,22 +1009,24 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
         // Load port information
         if (port_info(amidi_data->seq, pinfo, port_mode, (int) port_number) == 0) {
             // Display an error if port number is not available
-            if (in) slog("Alsa MIDI in", "invalid port number for port opening.");
-            else    slog("Alsa MIDI out", "invalid port number for port opening.");
+            if (port_type == MP_IN || port_type == MP_VIRTUAL_IN)
+                slog("Alsa MIDI in", "invalid port number for port opening.");
+            else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT)
+                slog("Alsa MIDI out", "invalid port number for port opening.");
             result = -1;
         }
         // Configure sender and receiver
-        if (in) {
+        if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
             sender.client = snd_seq_port_info_get_client(pinfo);
             sender.port = snd_seq_port_info_get_port(pinfo);
             receiver.client = snd_seq_client_id(amidi_data->seq);
-        } else {
+        } else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
             receiver.client = snd_seq_port_info_get_client(pinfo);
             receiver.port = snd_seq_port_info_get_port(pinfo);
             sender.client = snd_seq_client_id(amidi_data->seq);
         }
         // Allocate a snd_seq_port_info_t port information container on stack
-        if (in) {
+        if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
             snd_seq_port_info_alloca(&pinfo);
             if (amidi_data->vport < 0) {
                 // Set the client id of a port_info container
@@ -1025,7 +1053,7 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
                 }
                 amidi_data->vport = snd_seq_port_info_get_port( pinfo );
             }
-        } else {
+        } else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
             // Create a virtual output port
             if (amidi_data->vport < 0) {
                amidi_data->vport = snd_seq_create_simple_port(
@@ -1041,15 +1069,20 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
            }
         }
         // Store a port at receiver or sender depending on a call options
-        if (in) receiver.port = amidi_data->vport;
-        else    sender.port   = amidi_data->vport;
+        if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
+            receiver.port = amidi_data->vport;
+        }
+        else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
+            sender.port   = amidi_data->vport;
+        }
         // Create a subscription for input or output port
         if (!amidi_data->subscription) {
             if (snd_seq_port_subscribe_malloc(&amidi_data->subscription) < 0) {
-                if (in) {
+                if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
                     slog("Alsa MIDI in", "error allocating port subscription.");
                     result = -1;
-                } else {
+                }
+                else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
                     snd_seq_port_subscribe_free(amidi_data->subscription);
                     slog("Alsa MIDI out", "error allocating port subscription.");
                     result = -1;
@@ -1059,8 +1092,8 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
             snd_seq_port_subscribe_set_sender(amidi_data->subscription, &sender);
             // Set destination address of a port_subscribe container
             snd_seq_port_subscribe_set_dest(amidi_data->subscription, &receiver);
-            //
-            if (!in) {
+            // TODO describe
+            if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
                 // Set the time-update mode of a port_subscribe container
                 snd_seq_port_subscribe_set_time_update(amidi_data->subscription, 1);
                 // Set the real-time mode of a port_subscribe container
@@ -1068,12 +1101,12 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
             }
             // Subscribe to a port, store ALSA subscription information in amidi_data->subscription
             if (snd_seq_subscribe_port(amidi_data->seq, amidi_data->subscription)) {
-                if (in) {
+                if (port_type == MP_IN || port_type == MP_VIRTUAL_IN) {
                     snd_seq_port_subscribe_free(amidi_data->subscription);
                     amidi_data->subscription = 0;
                     slog("Alsa MIDI in", "error making port connection.");
                     result = -1;
-                } else {
+                } else if (port_type == MP_OUT || port_type == MP_VIRTUAL_OUT) {
                     snd_seq_port_subscribe_free(amidi_data->subscription);
                     slog("ALSA MIDI out", "opening an output port: ALSA error making port connection.");
                     result = -1;
@@ -1084,7 +1117,7 @@ int open_port(bool in, Alsa_MIDI_data * amidi_data, unsigned int port_number, co
             result = -1;
         }
         // Start an input thread if it wasn't started yet
-        if (in && input_data->do_input == false) {
+        if ((port_type == MP_IN || port_type == MP_VIRTUAL_IN) && input_data->do_input == false) {
             // Start the input queue
             #ifndef AVOID_TIMESTAMPING
             snd_seq_start_queue(amidi_data->seq, amidi_data->queue_id, NULL);
