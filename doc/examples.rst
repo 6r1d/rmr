@@ -66,3 +66,17 @@ Output
    :language: c
    :linenos:
 
+Using :c:func:`get_full_port_name`
+----------------------------------
+
+This example finds and identifies an input or output port.
+
+If you run a "virtual output" example and expected_port_type variable is set as :c:member:`mp_type_t.MP_VIRTUAL_OUT`, it will display "rmr virtual output:rmr virtual output port 128:0".
+
+If you run a "virtual input" example and expected_port_type variable is set as :c:member:`mp_type_t.MP_VIRTUAL_IN`, it will display "rmr virtual input:rmr 128:0".
+
+While this output format might look unusual, it provides info about two Alsa containers: "client info" and "port info", in that order.
+
+.. literalinclude:: ../examples/get_full_port_name/get_full_port_name.c
+   :language: c
+   :linenos:

@@ -1,7 +1,3 @@
-/*
- * This example finds and identifies a virtual output port.
- */
-
 #include <stdbool.h>
 #include "util/output_handling.h"
 // Main RMR header file
@@ -15,6 +11,7 @@ RMR_Port_config * port_config;
 char * port_name;
 
 #define PORT_NAME_MAX_LENGTH 512
+
 // MP_VIRTUAL_OUT for virtual output, MP_VIRTUAL_IN for virtual input.
 // Non-virtual ports are accepted the same way.
 mp_type_t expected_port_type = MP_VIRTUAL_OUT;

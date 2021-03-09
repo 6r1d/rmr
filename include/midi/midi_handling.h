@@ -1526,6 +1526,10 @@ int start_port(Alsa_MIDI_data **amidi_data, RMR_Port_config * port_config) {
  * Finds a complete port name, including both **client info** and **port info**.
  * A rewrite of both RtMIDI's getPortName functions.
  *
+ * While this output format might look unusual, it provides info about two Alsa containers:
+ * "client info" and "port info", in that order.
+ * It shows names and IDs.
+ *
  * :param port_name: a const char pointer pointing to a string to be filled
  * :param port_number: a number of a port to look for
  * :param port_type: supports all values for :c:type:`mp_type_t`, used to select
