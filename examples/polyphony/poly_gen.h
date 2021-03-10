@@ -1,5 +1,10 @@
 /*
- * Polyphony part, based on Acratone synth, slightly changed.
+ * This header file provides a polyphony implementation.
+ * Polyphony allows to play several notes simultaneously, each played note is called a voice.
+ * A note stops at a certain moment and this is called "voice stealing.
+ * It is based on Acratone with minimal changes.
+ *
+ * https://github.com/Saegor/acratone
  */
 
 #include <stdio.h>
@@ -9,11 +14,10 @@
 #include <fcntl.h>
 #include <math.h>
 
-// 16 voices
+// An amount of voices to use for polyphony
 #define VOICES_CNT 16
-// Sample rate constant for Alsa
-#define SAMPLE_RATE 44100
-
+// Maximum possible energy a voice has.
+// High energy = long playing voice.
 #define ENERGY_MAX 20000
 
 // A structure for a polyphony voice,
@@ -29,12 +33,12 @@ typedef struct {
 // Allocates an array of the polyphony voices
 poly_voice_t * tab[VOICES_CNT] = {NULL};
 
-// Converts a float phase value to a float saw value
+// Converts a float phase value to a float sinusoid wave sample
 float phase_to_sin(float p) {
     return sinf(2 * M_PI * p);
 }
 
-// Remove a note from *ACTIVE voices?*
+// TODO: does it remove a note from *ACTIVE voices?*
 void free_note(int id) {
     // Throw an error if a voice does not exist
     assert(tab[id] != NULL);
@@ -44,11 +48,12 @@ void free_note(int id) {
     tab[id] = NULL;
 }
 
+// TODO
 void clear_buffer(int buffer_size, float * buffer_out) {
     for (int bf = 0; bf < buffer_size; bf++) buffer_out[bf] = 0.0;
 }
 
-// Fills a buffer with samples
+// Takes a buffer as an argument, renders sounds, fills said buffer
 void fill_buffer(int buffer_size, float * buffer_out, float step) {
     for (int bf = 0; bf < buffer_size; bf++) {
         for (int id = 0; id < VOICES_CNT; id++) {
@@ -73,13 +78,15 @@ void fill_buffer(int buffer_size, float * buffer_out, float step) {
     }
 }
 
+// TODO
 void free_voice_memory() {
-    // Free voice memory before exiting
+    // Free each voice memory before exiting
     for (int id = 0; id < VOICES_CNT; id++) {
         if (tab[id] != NULL) free_note(id);
     }
 }
 
+// TODO
 int voice_available() {
     int result = -1;
     for (int id = 0; id < VOICES_CNT; id++) {
@@ -116,6 +123,7 @@ void drop_note(int id) {
     tab[id]->hold = 0;
 }
 
+// TODO
 void drop_note_by_value(unsigned int note) {
     for (int id = 0; id < VOICES_CNT; id++) {
         if (tab[id]->midi_note == note) {
@@ -130,11 +138,15 @@ float semitone_to_freq(float s) {
     return pow(2, (s - 69) / 12.) * 440.0;
 }
 
-// Original: musicdsp.org
+// Converts a MIDI note to a frequency value in Hz.
+//
+// Original by DFL:
+// https://www.musicdsp.org/en/latest/Other/125-midi-note-frequency-conversion.html
 double midi_note_to_freq(char keynum) {
     return 440.0 * pow(2.0, ((double)keynum - 69.0) / 12.0);
 }
 
+// TODO
 void scan_voices() {
     int target_voice = -1;
     for (int id = 0; id < VOICES_CNT; id++) {
