@@ -33,13 +33,13 @@ void handle_midi_buffer(unsigned char * buf, long count) {
         printf(" n %d ", buf[1]); // note
         printf(" %f ", midi_note_to_freq(buf[1]));
         printf(" v %02x ", buf[2]); // velocity
-        new_note(midi_note_to_freq(buf[1]), 0, ENERGY_MAX);
+        if (buf[1] > -1 && buf[1] < 128 && find_held_midi_note_in_tab(buf[1]) == -1) new_note(buf[1], midi_note_to_freq(buf[1]), 1, ENERGY_MAX);
     }
     else if (buf[0] == MIDI_MSG_NOTE_OFF) {
         printf("Note Off");
         printf(" n %d ", buf[1]); // note
         printf(" z?%02x ", buf[2]); // zero
-        if (buf[0] > -1 && buf[0] < 128) drop_note_by_value(buf[1]);
+        if (buf[1] > -1 && buf[1] < 128) drop_notes_by_value(buf[1]);
     }
     else if (buf[0] == MIDI_MSG_CONT_CTR) {
         printf("Continuous controller");

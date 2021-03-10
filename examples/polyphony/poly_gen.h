@@ -1,7 +1,7 @@
 /*
  * This header file provides a polyphony implementation.
  * Polyphony allows to play several notes simultaneously, each played note is called a voice.
- * A note stops at a certain moment and this is called "voice stealing.
+ * A note stops at a certain moment and this is called "voice stealing".
  * It is based on Acratone with minimal changes.
  *
  * https://github.com/Saegor/acratone
@@ -101,13 +101,14 @@ int voice_available() {
 }
 
 // Add a note to a voice array
-int new_note(float freq, int hold, unsigned int energy) {
+int new_note(unsigned int note, float freq, int hold, unsigned int energy) {
     // Search for an unused voice
     int id = voice_available();
     if (id > -1) {
         // Allocate memory for a new voice
         poly_voice_t * n = malloc(sizeof(poly_voice_t));
         // Fill voice parameters
+        n->midi_note = note;
         n->freq = freq;
         n->hold = hold;
         n->phase = 0.0;
@@ -121,21 +122,59 @@ int new_note(float freq, int hold, unsigned int energy) {
 
 // Stops holding a note so envelope can update.
 // Accepts a voice ID.
-void drop_note(int id) {
+void drop_note_by_id(int id) {
     assert(tab[id] != NULL);
     tab[id]->hold = 0;
 }
 
-// Stops holding a note so envelope can update.
+// Stops holding a note, so its envelope can update.
+//
 // Accepts a MIDI note.
 void drop_note_by_value(unsigned int note) {
     for (int id = 0; id < VOICES_CNT; id++) {
-        if (tab[id]->midi_note == note) {
-            drop_note(id);
+        if (tab[id] != NULL && tab[id]->midi_note == note) {
+            drop_note_by_id(id);
             break;
         }
     }
 }
+
+// Stops holding all instances of a polyphony note,
+// so their envelopes can update.
+//
+// Accepts a MIDI note.
+void drop_notes_by_value(unsigned int note) {
+    for (int id = 0; id < VOICES_CNT; id++) {
+        if (tab[id] != NULL && tab[id]->midi_note == note) {
+            drop_note_by_id(id);
+        }
+    }
+}
+
+// Locates a note in a polyphony tab
+int find_midi_note_in_tab(unsigned int note) {
+    int result = -1;
+    for (int id = 0; id < VOICES_CNT; id++) {
+        if (tab[id] != NULL && tab[id]->midi_note == note) {
+            result = id;
+            break;
+        }
+    }
+    return result;
+}
+
+// Locates a held note in a polyphony tab
+int find_held_midi_note_in_tab(unsigned int note) {
+    int result = -1;
+    for (int id = 0; id < VOICES_CNT; id++) {
+        if (tab[id] != NULL && tab[id]->hold == 1 && tab[id]->midi_note == note) {
+            result = id;
+            break;
+        }
+    }
+    return result;
+}
+
 
 // Convert a float semitone value to a float frequency value
 float semitone_to_freq(float s) {
@@ -196,7 +235,6 @@ int get_max_notes() {
 int empty_id(int id) {
     return tab[id] == NULL;
 }
-
 
 // Convert a float frequency value to a float semitone value
 float freq_to_semitone(float f) {
