@@ -38,7 +38,8 @@ float phase_to_sin(float p) {
     return sinf(2 * M_PI * p);
 }
 
-// TODO: does it remove a note from *ACTIVE voices?*
+// Remove a note from a voice tab.
+// It doesn't matter if a voice is active.
 void free_note(int id) {
     // Throw an error if a voice does not exist
     assert(tab[id] != NULL);
@@ -48,12 +49,12 @@ void free_note(int id) {
     tab[id] = NULL;
 }
 
-// TODO
+// Clears a sound buffer.
 void clear_buffer(int buffer_size, float * buffer_out) {
     for (int bf = 0; bf < buffer_size; bf++) buffer_out[bf] = 0.0;
 }
 
-// Takes a buffer as an argument, renders sounds, fills said buffer
+// Takes a buffer as an argument, fills said buffer while rendering sound samples.
 void fill_buffer(int buffer_size, float * buffer_out, float step) {
     for (int bf = 0; bf < buffer_size; bf++) {
         for (int id = 0; id < VOICES_CNT; id++) {
@@ -78,15 +79,16 @@ void fill_buffer(int buffer_size, float * buffer_out, float step) {
     }
 }
 
-// TODO
+// Free each polyphony voice memory
 void free_voice_memory() {
-    // Free each voice memory before exiting
     for (int id = 0; id < VOICES_CNT; id++) {
         if (tab[id] != NULL) free_note(id);
     }
 }
 
-// TODO
+// Checks if a polyphony voice is available for using.
+// Returns a voice ID if it is available.
+// Returns -1 otherwise.
 int voice_available() {
     int result = -1;
     for (int id = 0; id < VOICES_CNT; id++) {
@@ -117,17 +119,19 @@ int new_note(float freq, int hold, unsigned int energy) {
     return id;
 }
 
-// Stop holding a voice
+// Stops holding a note so envelope can update.
+// Accepts a voice ID.
 void drop_note(int id) {
     assert(tab[id] != NULL);
     tab[id]->hold = 0;
 }
 
-// TODO
+// Stops holding a note so envelope can update.
+// Accepts a MIDI note.
 void drop_note_by_value(unsigned int note) {
     for (int id = 0; id < VOICES_CNT; id++) {
         if (tab[id]->midi_note == note) {
-            free_note(id);
+            drop_note(id);
             break;
         }
     }
@@ -146,7 +150,8 @@ double midi_note_to_freq(char keynum) {
     return 440.0 * pow(2.0, ((double)keynum - 69.0) / 12.0);
 }
 
-// TODO
+// A function to display active polyphony voices.
+// Should display results immediately.
 void scan_voices() {
     int target_voice = -1;
     for (int id = 0; id < VOICES_CNT; id++) {
@@ -198,7 +203,7 @@ float freq_to_semitone(float f) {
     return 12 * log2(f / 440.0) + 69;
 }
 
-// Float modulo 12
+// Returns a modulo 12 result for a float input
 float mod_12(float f) {
     while (f >= 12) f -= 12;
     while (f < 0) f += 12;

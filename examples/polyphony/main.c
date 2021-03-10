@@ -39,6 +39,7 @@ void handle_midi_buffer(unsigned char * buf, long count) {
         printf("Note Off");
         printf(" n %d ", buf[1]); // note
         printf(" z?%02x ", buf[2]); // zero
+        if (buf[0] > -1 && buf[0] < 128) drop_note_by_value(buf[1]);
     }
     else if (buf[0] == MIDI_MSG_CONT_CTR) {
         printf("Continuous controller");
