@@ -31,9 +31,9 @@ void handle_midi_buffer(unsigned char * buf, long count) {
     if (buf[0] == MIDI_MSG_NOTE_ON) {
         printf("Note On");
         printf(" n %d ", buf[1]); // note
-        printf(" %f ", midi_note_to_freq(buf[1]));
+        printf(" %f ", midi_note_to_freq((char)buf[1]));
         printf(" v %02x ", buf[2]); // velocity
-        if (buf[1] > -1 && buf[1] < 128 && find_held_midi_note_in_tab(buf[1]) == -1) new_note(buf[1], midi_note_to_freq(buf[1]), 1, ENERGY_MAX);
+        if (buf[1] > -1 && buf[1] < 128 && find_held_midi_note_in_tab(buf[1]) == -1) new_note(buf[1], midi_note_to_freq((char)buf[1]), 1, ENERGY_MAX);
     }
     else if (buf[0] == MIDI_MSG_NOTE_OFF) {
         printf("Note Off");
@@ -86,6 +86,8 @@ static void write_callback(struct SoundIoOutStream *outstream, int frame_count_m
 
     // Clear the buffer
     clear_buffer(frame_count_max, buffer_out);
+
+    // Calculate new values for the buffer
     for (int bf = 0; bf < frame_count_max; bf++) {
         if (frame_count_max < 5000 && bf % 10 == 0) scan_queue();
         for (int id = 0; id < VOICES_CNT; id++) {
@@ -109,6 +111,7 @@ static void write_callback(struct SoundIoOutStream *outstream, int frame_count_m
         }
     }
 
+    // Fill samples in a buffer
     while (frames_left > 0) {
         int frame_count = frames_left;
 
@@ -217,11 +220,6 @@ int main(int argc, char **argv) {
     soundio_destroy(soundio);
 
     free_voice_memory();
-
-
-
-
-
 
     // Close a MIDI input port,
     // shutdown the input thread,
