@@ -97,7 +97,8 @@ static void write_callback(struct SoundIoOutStream *outstream, int frame_count_m
                 if (!n->hold && n->energy > 0) n->energy -= 1;
                 // Update phase
                 n->phase += n->freq * step;
-                if (n->phase >= 2.0) n->phase = 0.0;
+                // Reset phase to prevent (potential) overflow.
+                if (n->phase >= 1.0) n->phase -= 1.0f;
                 // Generate a wave
                 float last_sample = ( (float)n->energy / (float)ENERGY_MAX ) * phase_to_sin(n->phase);
                 // Mix and store sample in a buffer

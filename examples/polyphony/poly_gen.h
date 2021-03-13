@@ -33,7 +33,8 @@ typedef struct {
 // Allocates an array of the polyphony voices
 poly_voice_t * tab[VOICES_CNT] = {NULL};
 
-// Converts a float phase value to a float sinusoid wave sample
+// Converts a float phase value to a float sinusoid wave sample.
+// Changes sine function period from 2 Pi to 1.
 float phase_to_sin(float p) {
     return sinf(2 * M_PI * p);
 }
