@@ -1192,7 +1192,9 @@ void close_port(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data, int mode
             &input_data->do_input,
             sizeof( input_data->do_input )
         );
+        // TODO is there a point in this call?
         (void) res;
+        // Wait for old thread to stop, if still running
         if ( !pthread_equal( amidi_data->thread, amidi_data->dummy_thread_id ) )
             pthread_join( amidi_data->thread, NULL );
     }
@@ -1242,8 +1244,11 @@ int destroy_midi_input(Alsa_MIDI_data * amidi_data, MIDI_in_data * input_data) {
     if (input_data != NULL && input_data->do_input) {
         input_data->do_input = false;
         int res = write(amidi_data->trigger_fds[1], &input_data->do_input, sizeof(input_data->do_input));
+        // TODO is there a point in this call?
         (void) res;
-        if ( !pthread_equal(amidi_data->thread, amidi_data->dummy_thread_id) ) pthread_join(amidi_data->thread, NULL);
+        // Wait for old thread to stop, if still running
+        if (!pthread_equal(amidi_data->thread, amidi_data->dummy_thread_id))
+            pthread_join(amidi_data->thread, NULL);
     }
     // Do cleanup
     close(amidi_data->trigger_fds[0]);
