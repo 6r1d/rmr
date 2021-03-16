@@ -48,7 +48,7 @@ int main() {
 
     // Run until SIGINT is received
     while (keep_process_running) {
-        while (g_async_queue_length_unlocked(input_data->midi_async_queue)) {
+        while (g_async_queue_length(input_data->midi_async_queue)) {
             // Read a message from a message queue
             msg = g_async_queue_try_pop(input_data->midi_async_queue);
             if (msg != NULL) {
@@ -57,7 +57,7 @@ int main() {
                 free_midi_message(msg);
             }
         }
-        while (g_async_queue_length_unlocked(input_data->error_async_queue)) {
+        while (g_async_queue_length(input_data->error_async_queue)) {
             // Read an error message from an error queue,
             // simply deallocate it for now
             err_msg = g_async_queue_try_pop(input_data->midi_async_queue);
