@@ -9,6 +9,14 @@ This document exists to handle things gradually, not create issues when I solve 
 
 ------------
 
+Thread use
+----------
+
+There's **dummy_thread_id** and **thread** properties.
+**dummy_thread_id** receives a value returned by **pthread_self()**.
+Then the **dummy_thread_id** gets assigned to **thread** variable.
+It is done to check when previous input thread is finished.
+
 Terminology
 -----------
 
