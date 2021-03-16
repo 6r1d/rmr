@@ -18,7 +18,7 @@
 #define VOICES_CNT 16
 // Maximum possible energy a voice has.
 // High energy = long playing voice.
-#define ENERGY_MAX 20000
+#define ENERGY_MAX 5000
 
 // A structure for a polyphony voice,
 // containing a number of samples
