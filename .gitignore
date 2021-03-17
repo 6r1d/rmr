@@ -10,4 +10,6 @@ test/test_last_bytearray_byte/main
 examples/get_full_port_name/get_full_port_name
 examples/input_bytes_callback/input
 examples/virtual_input_callback/virtual_input
+examples/polyphony/main
+test/get_full_port_name/get_full_port_name
 
